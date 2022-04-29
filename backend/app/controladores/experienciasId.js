@@ -1,10 +1,10 @@
 const Experiencias = require('../../models/Experiencias_Model');
+const axios = require('axios')
 
 
 function getExperienceId (req, res, next){
 
     let {id} = req.params;
-
 
     try{
 
@@ -27,6 +27,10 @@ function getExperienceId (req, res, next){
 function deleteExperienceId (req, res, next) {
 
     let {id} = req.params;
+
+    if (!id){
+        return res.status(400).json({message: 'Por favor ingrese el ID de la experiencia a borrar'});
+    }
     
     
     try{
@@ -46,13 +50,25 @@ function deleteExperienceId (req, res, next) {
     }
 }
 
-function putExperience (req, res, next) {
+async function putExperienceId (req, res, next) {
     
     let {id} = req.params;
     let update = req.body;
-    
 
-    console.log(update)
+    if(!Object.keys(update).length){
+        return res.status(400).json({message: 'Ingrese por lo menos (1) cambio a su experiencia'});
+    }
+    if (!id){
+        return res.status(400).json({message: 'Por favor ingrese el ID de la experiencia a modificar'});
+    }
+
+    if(update.titulo){
+        
+        let nuevaUrl = await generateNewImage(update.titulo);
+
+        update.imagenRelacionada = nuevaUrl
+    }
+
 
 
     try{
@@ -61,7 +77,7 @@ function putExperience (req, res, next) {
             if(err || !acc){
                 return res.status(400).json({message: 'No se pudo actualizar tu experiencia'});
             }
-            return res.status(200).json({message: 'Actualizado correctamente', acc, update})
+            return res.status(200).json({message: 'Actualizado correctamente', update})
         })
 
     }
@@ -71,4 +87,18 @@ function putExperience (req, res, next) {
 
 }
 
-module.exports = {getExperienceId, deleteExperienceId, putExperience}
+const generateNewImage = async function (query) {
+    let lower = query.toLowerCase();
+
+    let toSearch = lower.replace(" ", ",");
+
+    let busqueda = await axios.get(`https://source.unsplash.com/random/?${toSearch}`);
+
+    let url = busqueda.request.res.responseUrl
+
+
+    return (url.toString())
+}
+
+
+module.exports = {getExperienceId, deleteExperienceId, putExperienceId}

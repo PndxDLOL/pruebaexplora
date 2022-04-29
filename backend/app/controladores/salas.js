@@ -5,6 +5,9 @@ function getExperiencesSalas (req, res, next){
 
     let {nombre} = req.params;
 
+    if(!nombre){
+        return res.status(400).json({message: 'Ingresa el nombre de la sala que deseas buscar'})
+    }
 
 
     try{

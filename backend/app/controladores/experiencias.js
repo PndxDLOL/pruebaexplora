@@ -1,6 +1,5 @@
-const {createClient} = require('pexels');
 const Experiencias = require('../../models/Experiencias_Model');
-const PEXELS_KEY = process.env.PEXELS_KEY;
+
 
 
 
@@ -21,38 +20,48 @@ function getExperiences (req, res, next){
     }
 }
 
-function postExperience (req, res, next) {
+async function postExperience (req, res, next) {
 
     try{       
-        let {titulo, descripcion, salaInteractiva} = req.body;
-        
+        let {titulo, descripcion, salaInteractiva, imagen} = req.body;
+
+        if(!titulo){
+            return res.status(400).json({message: 'Por favor ingresa un titulo a tu experiencia'});
+        }
+        if(!descripcion){
+            return res.status(400).json({message: 'Por favor ingresa una breve descripción de tu experiencia'});
+        }
+        if(!salaInteractiva){
+            return res.status(400).json({message: 'Por favor selecciona la Sala Interactiva donde viviste tu experiencia'});
+        }
+        if(!imagen){
+            return res.status(400).json({message: 'Por favor compartenos una imagen de tu experiencia'});
+        }
+
+
         let nuevaExperiencia = new Experiencias({
             titulo,
             descripcion,
-            salaInteractiva
+            salaInteractiva,
+            imagen
         })
         
-        nuevaExperiencia.imgenRelacionada = generateImage(titulo);
+        nuevaExperiencia.imgenRelacionada =  await nuevaExperiencia.generateImage(titulo);
+    
+
         
         nuevaExperiencia.save((err, exp) => { 
             if (err || !exp){
-                return res.status(400).json({message: "No pudimos registrar tu experiencia"})
+                return res.status(400).json({message: `No pudimos registrar tu experiencia ${err}`})
             }
+        
             return res.status(200).json({message: `Experiencia ${exp.id} creada con exito`})
         })
         
     }
     catch(err){
-        next(error)
+        next(err)
     }
-}
-
-
-const generateImage = (query) => {    
-    const client = createClient(PEXELS_KEY);
-    client.photos.search({query, per_page: 1})
-    .then(photos => {return photos})
-
 }
 
 

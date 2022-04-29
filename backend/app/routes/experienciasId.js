@@ -7,13 +7,12 @@ const experienciasId = require('../controladores/experienciasId');
 
 router.get('/:id', experienciasId.getExperienceId);
 
-
 // DELETE EXPERIENCIA
 
 router.delete('/:id', experienciasId.deleteExperienceId);
 
 // PUT EXPERIENCIA
 
-router.put('/:id', experienciasId.putExperience);
+router.put('/:id', experienciasId.putExperienceId);
 
 module.exports = router;
