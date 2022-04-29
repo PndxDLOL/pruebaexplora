@@ -41,7 +41,7 @@ function deleteExperienceId (req, res, next) {
                 return res.status(400).json({message: 'No pudimos borrar tu experiencia'});
             }
 
-            return res.status(200).json({message: 'Experiencia borrada con exito'})
+            return res.status(200).json({message: `Experiencia  ${id} borrada con exito`})
 
         })
     }
